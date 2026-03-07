@@ -45,7 +45,7 @@
 | Phase 1 | 文档与骨架 | `Implemented` | 文档真源齐备、工作区可构建 |
 | Phase 2 | 本地 WebDAV 存储 | `In Progress` | 本地 FS + WebDAV + token 闭环 |
 | Phase 3 | 2FA 集成验证 | `Ready for Acceptance` | 2FA 可通过 WebDAV 完成 push/pull |
-| Phase 4 | 自托管部署闭环 | `Ready for Acceptance` | Docker + 运行文档 + 2FA 接入手册 |
+| Phase 4 | 自托管部署闭环 | `Implemented / Ready for Acceptance` | Docker 镜像发布 + 运行文档 + 2FA 接入手册 |
 | Phase 5 | 对象存储与托管化 | `Planned` | S3 backend、在线授权、计费策略 |
 | Phase 6 | 通用应用存储云 | `Planned` | 多 app 管理、网盘、协议扩展 |
 
@@ -89,6 +89,7 @@
 - [x] `compose.yml`
 - [x] `infra/README.md` 运行说明
 - [x] `infra/2fa-webdav.md` 对接手册
+- [x] Docker Hub 发布脚本与工作流
 - [ ] 反向代理与 TLS 模板
 
 ### P4. 后续扩展

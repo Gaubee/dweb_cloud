@@ -2,6 +2,7 @@
 
 仓库地址：<https://github.com/Gaubee/dweb_cloud>
 关联客户端：<https://github.com/Gaubee/2fa>
+Docker 镜像：<https://hub.docker.com/r/gaubee/dweb-cloud>
 
 基于 `Rust` 的应用存储云内核，提供 `Web3` 风格密钥身份、应用隔离的存储空间，以及面向客户端应用的 `WebDAV` 接入能力。
 
@@ -15,6 +16,7 @@
 - [CHAT.md](./CHAT.md)：来自 2FA 仓库拆分的原始需求轨迹。
 - [infra/README.md](./infra/README.md)：本地运行、Docker 部署与运维说明。
 - [infra/2fa-webdav.md](./infra/2fa-webdav.md)：把 dwebCloud 接入 2FA 的快速手册。
+- [.github/workflows/publish-docker.yml](./.github/workflows/publish-docker.yml)：基于 tag 或手动触发的 Docker 发布工作流。
 
 ## 目录
 
@@ -36,6 +38,7 @@
 - app-scoped WebDAV 本地服务。
 - `gaubee-2fa` 的默认 app 注册。
 - Docker 自托管最小闭环。
+- Docker Hub 发布脚本与 GitHub Actions 工作流。
 - 2FA WebDAV 联调文档。
 
 后续推进：
@@ -62,6 +65,26 @@ cargo run -p dweb-cloud-cli -- token issue \
   --app gaubee-2fa \
   --secret "your secret" \
   --json
+```
+
+### Docker Hub 直接运行
+
+拉取镜像：
+
+```bash
+docker pull gaubee/dweb-cloud:latest
+```
+
+直接运行：
+
+```bash
+docker run -d --name dweb-cloud \
+  -p 9080:9080 \
+  -e DWEB_CLOUD_HTTP=0.0.0.0:9080 \
+  -e DWEB_CLOUD_DATA_DIR=/var/lib/dweb-cloud \
+  -e DWEB_CLOUD_APP_CONFIG=/app/config/apps.json \
+  -v dweb-cloud-data:/var/lib/dweb-cloud \
+  gaubee/dweb-cloud:latest
 ```
 
 ### Docker Compose 运行
@@ -116,4 +139,10 @@ cargo test --workspace
 
 ```bash
 docker compose config
+```
+
+发布镜像：
+
+```bash
+./scripts/publish-docker.sh 0.1.0
 ```

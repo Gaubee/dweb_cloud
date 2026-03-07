@@ -22,7 +22,27 @@ cargo run -p dweb-cloud-cli -- token issue \
   --json
 ```
 
-### 2. Docker Compose 运行
+### 2. Docker Hub 镜像运行
+
+拉取镜像：
+
+```bash
+docker pull gaubee/dweb-cloud:latest
+```
+
+启动服务：
+
+```bash
+docker run -d --name dweb-cloud \
+  -p 9080:9080 \
+  -e DWEB_CLOUD_HTTP=0.0.0.0:9080 \
+  -e DWEB_CLOUD_DATA_DIR=/var/lib/dweb-cloud \
+  -e DWEB_CLOUD_APP_CONFIG=/app/config/apps.json \
+  -v dweb-cloud-data:/var/lib/dweb-cloud \
+  gaubee/dweb-cloud:latest
+```
+
+### 3. Docker Compose 运行
 
 启动服务：
 
@@ -51,6 +71,20 @@ docker compose exec dweb-cloud dweb-cloud-cli token issue \
 ```bash
 docker compose down
 ```
+
+## 镜像发布
+
+本地发布：
+
+```bash
+./scripts/publish-docker.sh 0.1.0
+```
+
+GitHub Actions 发布：
+
+- 推送 tag，例如 `v0.1.0`
+- 或手动触发 `.github/workflows/publish-docker.yml`
+- 需要仓库 secrets：`DOCKERHUB_USERNAME` 与 `DOCKERHUB_TOKEN`
 
 ## 默认配置
 

@@ -11,6 +11,7 @@
 
 - 提供本地 Rust 运行方式
 - 提供 `Dockerfile + compose.yml` 的最小自托管闭环
+- 提供 Docker Hub 镜像命名与发布链路
 - 提供 2FA 对接手册
 - 让没有 Rust 环境的部署者也能跑起服务
 
@@ -20,6 +21,7 @@
 - 数据目录必须可持久化
 - app 配置通过 `config/apps.json` 挂载
 - 不在 v1 内提供正式反向代理、TLS、监控、告警模板
+- Docker Hub 镜像以 `gaubee/dweb-cloud` 作为默认命名
 
 ## 运维最小要求
 
