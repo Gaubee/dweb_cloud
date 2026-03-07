@@ -1,8 +1,11 @@
 # dwebCloud
 
+仓库地址：<https://github.com/Gaubee/dweb_cloud>
+关联客户端：<https://github.com/Gaubee/2fa>
+
 基于 `Rust` 的应用存储云内核，提供 `Web3` 风格密钥身份、应用隔离的存储空间，以及面向客户端应用的 `WebDAV` 接入能力。
 
-当前仓库聚焦 `v1`：为 `gaubee-2fa` 提供本地文件系统版 `WebDAV + 签名换 token` 最小闭环。
+当前仓库聚焦 `v1`：为 [`gaubee-2fa`](https://github.com/Gaubee/2fa) 提供本地文件系统版 `WebDAV + 签名换 token` 最小闭环。
 
 ## 文档
 
