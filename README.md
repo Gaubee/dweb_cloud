@@ -16,6 +16,7 @@ Docker 镜像：<https://hub.docker.com/r/gaubee/dweb-cloud>
 - [CHAT.md](./CHAT.md)：来自 2FA 仓库拆分的原始需求轨迹。
 - [infra/README.md](./infra/README.md)：本地运行、Docker 部署与运维说明。
 - [infra/2fa-webdav.md](./infra/2fa-webdav.md)：把 dwebCloud 接入 2FA 的快速手册。
+- [infra/production-deploy.md](./infra/production-deploy.md)：Caddy / Nginx 反向代理与 HTTPS 部署模板。
 - [.github/workflows/publish-docker.yml](./.github/workflows/publish-docker.yml)：基于 tag 或手动触发的 Docker 发布工作流。
 
 ## 目录
@@ -40,6 +41,7 @@ Docker 镜像：<https://hub.docker.com/r/gaubee/dweb-cloud>
 - Docker 自托管最小闭环。
 - Docker Hub 发布脚本与 GitHub Actions 工作流。
 - 2FA WebDAV 联调文档。
+- Caddy / Nginx 公网反向代理模板。
 
 后续推进：
 

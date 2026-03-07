@@ -83,14 +83,14 @@
 
 ### P3. 自托管部署
 
-状态：`Ready for Acceptance`
+状态：`Implemented / Ready for Acceptance`
 
 - [x] `Dockerfile`
 - [x] `compose.yml`
 - [x] `infra/README.md` 运行说明
 - [x] `infra/2fa-webdav.md` 对接手册
 - [x] Docker Hub 发布脚本与工作流
-- [ ] 反向代理与 TLS 模板
+- [x] 反向代理与 TLS 模板
 
 ### P4. 后续扩展
 

@@ -42,6 +42,8 @@ docker run -d --name dweb-cloud \
   gaubee/dweb-cloud:latest
 ```
 
+生产环境更推荐把服务绑定到本机回环地址，再由反向代理暴露公网入口。详见：[production-deploy.md](./production-deploy.md)。
+
 ### 3. Docker Compose 运行
 
 启动服务：
@@ -110,6 +112,14 @@ GitHub Actions 发布：
 - `tokens/`：token 记录
 - `accounts/<public_key_hex>/apps/<app_id>/`：该 app 的私有文件空间
 
+## 公网部署
+
+已提供：
+
+- [production-deploy.md](./production-deploy.md)
+- [caddy/Caddyfile.example](./caddy/Caddyfile.example)
+- [nginx/dweb-cloud.conf.example](./nginx/dweb-cloud.conf.example)
+
 ## 与 2FA 联调
 
 详见：[2fa-webdav.md](./2fa-webdav.md)
@@ -118,10 +128,9 @@ GitHub Actions 发布：
 
 `v1` 暂不在这里展开：
 
-- TLS 终止
-- 反向代理模板
 - `S3` backend
 - 在线授权回调页
 - 多 app 管理后台
+- 多节点编排与高可用
 
 这些能力在进入下一阶段之前，仍应先回写 `specs/` 再实现。

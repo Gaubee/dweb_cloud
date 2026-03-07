@@ -1,0 +1,15 @@
+# Replace cloud.example.com with your real domain.
+# Caddy will obtain and renew HTTPS certificates automatically.
+
+cloud.example.com {
+	encode zstd gzip
+
+	# Increase request limits if you expect larger WebDAV payloads.
+	request_body {
+		max_size 32MB
+	}
+
+	reverse_proxy 127.0.0.1:9080 {
+		header_up Host {host}
+	}
+}
