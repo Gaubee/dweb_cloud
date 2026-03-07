@@ -5,6 +5,10 @@
   "scripts": {
     "dev:server": "cargo run -p dweb-cloud-server -- --http 127.0.0.1:9080 --data-dir ./.data",
     "build:rust": "cargo build --workspace",
-    "check:rust": "cargo test --workspace"
+    "check:rust": "cargo test --workspace",
+    "docker:build": "docker build -t gaubee/dweb-cloud:local .",
+    "docker:up": "docker compose up -d --build",
+    "docker:logs": "docker compose logs -f dweb-cloud",
+    "docker:down": "docker compose down"
   }
 }

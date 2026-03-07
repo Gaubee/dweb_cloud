@@ -1,0 +1,19 @@
+services:
+  dweb-cloud:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gaubee/dweb-cloud:local
+    restart: unless-stopped
+    ports:
+      - "${DWEB_CLOUD_PORT:-9080}:9080"
+    environment:
+      DWEB_CLOUD_HTTP: 0.0.0.0:9080
+      DWEB_CLOUD_DATA_DIR: /var/lib/dweb-cloud
+      DWEB_CLOUD_APP_CONFIG: /app/config/apps.json
+    volumes:
+      - dweb-cloud-data:/var/lib/dweb-cloud
+      - ./config:/app/config:ro
+
+volumes:
+  dweb-cloud-data:

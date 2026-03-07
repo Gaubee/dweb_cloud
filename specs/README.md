@@ -12,3 +12,4 @@
 4. [04-auth-token-and-billing-spec.md](./04-auth-token-and-billing-spec.md)
 5. [05-2fa-integration-spec.md](./05-2fa-integration-spec.md)
 6. [06-engineering-quality-and-release-spec.md](./06-engineering-quality-and-release-spec.md)
+7. [07-deployment-and-operations-spec.md](./07-deployment-and-operations-spec.md)

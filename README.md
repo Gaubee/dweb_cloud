@@ -13,6 +13,8 @@
 - [specs/README.md](./specs/README.md)：产品与模块规格真源。
 - [AGENTS.md](./AGENTS.md)：开发元规则、最佳实践与标准工作流。
 - [CHAT.md](./CHAT.md)：来自 2FA 仓库拆分的原始需求轨迹。
+- [infra/README.md](./infra/README.md)：本地运行、Docker 部署与运维说明。
+- [infra/2fa-webdav.md](./infra/2fa-webdav.md)：把 dwebCloud 接入 2FA 的快速手册。
 
 ## 目录
 
@@ -33,6 +35,8 @@
 - challenge + signature + token 签发接口。
 - app-scoped WebDAV 本地服务。
 - `gaubee-2fa` 的默认 app 注册。
+- Docker 自托管最小闭环。
+- 2FA WebDAV 联调文档。
 
 后续推进：
 
@@ -40,7 +44,9 @@
 - Web 网盘管理页。
 - 在线授权回调与 app 接入流程。
 
-## 本地开发
+## 快速开始
+
+### 本地 Rust 运行
 
 启动服务：
 
@@ -58,18 +64,29 @@ cargo run -p dweb-cloud-cli -- token issue \
   --json
 ```
 
-CLI 会返回：
+### Docker Compose 运行
 
-- `webdavBaseUrl`
-- `username`
-- `password`
-- `expiresAtMs`
+```bash
+docker compose up -d --build
+```
+
+签发凭据：
+
+```bash
+docker compose exec dweb-cloud dweb-cloud-cli token issue \
+  --server http://127.0.0.1:9080 \
+  --app gaubee-2fa \
+  --secret "your secret" \
+  --json
+```
+
+更多细节见：[infra/README.md](./infra/README.md)
 
 ## 与 2FA 联调
 
 当前最小联调流程：
 
-1. 启动 `dweb-cloud-server`。
+1. 启动 `dweb-cloud-server` 或 `docker compose up -d --build`。
 2. 用 `dweb-cloud-cli token issue` 获取 WebDAV 凭据。
 3. 打开 2FA Web 页面。
 4. 在 WebDAV 卡片中填写：
@@ -79,15 +96,24 @@ CLI 会返回：
    - `Vault Secret = 任意本地加密口令`
 5. 先点击“验证配置”，再按需拉取或推送。
 
+详细步骤见：[infra/2fa-webdav.md](./infra/2fa-webdav.md)
+
 当前已验证：
 
 - `challenge -> signature -> token` 可用。
 - 使用返回的 Basic Auth 凭据可以通过 WebDAV 成功 `PUT / GET` 文件。
 - `MKCOL` 在已存在目录场景下返回 `405`，可被 2FA 当前实现正常接受。
+- 2FA 已能通过 `push / pull` 恢复加密快照。
 
 ## 构建与测试
 
 ```bash
 cargo build --workspace
 cargo test --workspace
+```
+
+有 Docker 环境时，还应验证：
+
+```bash
+docker compose config
 ```

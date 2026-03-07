@@ -44,9 +44,10 @@
 | --- | --- | --- | --- |
 | Phase 1 | 文档与骨架 | `Implemented` | 文档真源齐备、工作区可构建 |
 | Phase 2 | 本地 WebDAV 存储 | `In Progress` | 本地 FS + WebDAV + token 闭环 |
-| Phase 3 | 2FA 集成验证 | `In Progress` | 2FA 可通过 WebDAV 完成双端同步 |
-| Phase 4 | 对象存储与托管化 | `Planned` | S3 backend、在线授权、计费策略 |
-| Phase 5 | 通用应用存储云 | `Planned` | 多 app 管理、网盘、协议扩展 |
+| Phase 3 | 2FA 集成验证 | `Ready for Acceptance` | 2FA 可通过 WebDAV 完成 push/pull |
+| Phase 4 | 自托管部署闭环 | `Ready for Acceptance` | Docker + 运行文档 + 2FA 接入手册 |
+| Phase 5 | 对象存储与托管化 | `Planned` | S3 backend、在线授权、计费策略 |
+| Phase 6 | 通用应用存储云 | `Planned` | 多 app 管理、网盘、协议扩展 |
 
 ## 5. 当前优先级
 
@@ -73,14 +74,24 @@
 
 ### P2. 与 2FA 集成
 
-状态：`In Progress`
+状态：`Ready for Acceptance`
 
 - [x] 约定 `gaubee-2fa` app
-- [ ] 2FA 手动 WebDAV 配置
+- [x] 2FA 手动 WebDAV 配置
+- [x] 旧 Self Provider 移除
 - [ ] 双设备 push/pull 验证
-- [ ] 旧 Self Provider 移除
 
-### P3. 后续扩展
+### P3. 自托管部署
+
+状态：`Ready for Acceptance`
+
+- [x] `Dockerfile`
+- [x] `compose.yml`
+- [x] `infra/README.md` 运行说明
+- [x] `infra/2fa-webdav.md` 对接手册
+- [ ] 反向代理与 TLS 模板
+
+### P4. 后续扩展
 
 状态：`Planned`
 
