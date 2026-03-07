@@ -1,0 +1,7 @@
+[
+  {
+    "appId": "gaubee-2fa",
+    "label": "Gaubee 2FA",
+    "tokenTtlSecs": 2592000
+  }
+]

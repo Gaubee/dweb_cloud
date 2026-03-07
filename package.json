@@ -1,0 +1,10 @@
+{
+  "name": "@gaubee/dweb-cloud-workspace",
+  "private": true,
+  "packageManager": "pnpm@10.22.0",
+  "scripts": {
+    "dev:server": "cargo run -p dweb-cloud-server -- --http 127.0.0.1:9080 --data-dir ./.data",
+    "build:rust": "cargo build --workspace",
+    "check:rust": "cargo test --workspace"
+  }
+}

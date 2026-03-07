@@ -1,0 +1,22 @@
+[package]
+name = "dweb-cloud-server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+axum.workspace = true
+base64.workspace = true
+clap.workspace = true
+dav-server.workspace = true
+dav-server-opendalfs.workspace = true
+dweb-cloud-identity-core = { path = "../crates/identity-core" }
+dweb-cloud-storage-core = { path = "../crates/storage-core" }
+http.workspace = true
+opendal.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tower-http.workspace = true
+uuid.workspace = true
