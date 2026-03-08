@@ -22,6 +22,8 @@ COPY --from=builder /app/config ./config
 ENV DWEB_CLOUD_HTTP=0.0.0.0:9080
 ENV DWEB_CLOUD_DATA_DIR=/var/lib/dweb-cloud
 ENV DWEB_CLOUD_APP_CONFIG=/app/config/apps.json
+ENV DWEB_CLOUD_PLAN_CONFIG=/app/config/plans.json
+ENV DWEB_CLOUD_DEVELOPER_MODE=false
 
 EXPOSE 9080
 VOLUME ["/var/lib/dweb-cloud"]

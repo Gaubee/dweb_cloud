@@ -1,0 +1,30 @@
+services:
+  dweb-cloud:
+    image: gaubee/dweb-cloud:latest
+    restart: unless-stopped
+    environment:
+      DWEB_CLOUD_HTTP: 0.0.0.0:9080
+      DWEB_CLOUD_DATA_DIR: /var/lib/dweb-cloud
+      DWEB_CLOUD_APP_CONFIG: /app/config/apps.json
+      DWEB_CLOUD_PLAN_CONFIG: /app/config/plans.json
+    volumes:
+      - dweb-cloud-data:/var/lib/dweb-cloud
+      - ../config:/app/config:ro
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - dweb-cloud
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile.compose.example:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  dweb-cloud-data:
+  caddy-data:
+  caddy-config:

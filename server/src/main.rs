@@ -19,10 +19,12 @@ use clap::Parser;
 use dav_server::{DavConfig, DavHandler, body::Body as DavBody, fakels::FakeLs};
 use dav_server_opendalfs::OpendalFs;
 use dweb_cloud_identity_core::{SignedChallenge, verify_signed_challenge};
-use dweb_cloud_storage_core::{AppConfig, ChallengeRecord, FileStore};
+use dweb_cloud_storage_core::{AppConfig, ChallengeRecord, FileStore, PlanConfig, StoreStats};
 use opendal::{Operator, services::Fs};
 use serde::{Deserialize, Serialize};
 use tower_http::cors::{Any, CorsLayer};
+
+const ACCOUNT_MANAGEMENT_SCOPE: &str = "dweb-cloud-account";
 
 #[derive(Debug, Parser)]
 struct Args {
@@ -36,12 +38,22 @@ struct Args {
         default_value = "./config/apps.json"
     )]
     app_config: PathBuf,
+    #[arg(
+        long,
+        env = "DWEB_CLOUD_PLAN_CONFIG",
+        default_value = "./config/plans.json"
+    )]
+    plan_config: PathBuf,
+    #[arg(long, env = "DWEB_CLOUD_DEVELOPER_MODE", default_value_t = false)]
+    developer_mode: bool,
 }
 
 #[derive(Clone)]
 struct AppState {
     store: Arc<FileStore>,
     apps: Arc<HashMap<String, AppConfig>>,
+    plans: Arc<Vec<PlanConfig>>,
+    developer_mode: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -79,6 +91,51 @@ struct TokenIssueResponse {
     expires_at_ms: i64,
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AccountAuthRequest {
+    public_key_hex: String,
+    signature_hex: String,
+    timestamp_ms: i64,
+    device_id: String,
+    nonce: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct TokenListRequest {
+    public_key_hex: String,
+    signature_hex: String,
+    timestamp_ms: i64,
+    device_id: String,
+    nonce: String,
+    app_id_filter: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct TokenListResponse {
+    public_key_hex: String,
+    tokens: Vec<dweb_cloud_storage_core::TokenRecord>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct TokenRevokeResponse {
+    token_id: String,
+    revoked: bool,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct DeveloperMetaResponse {
+    developer_mode: bool,
+    management_scope_app_id: String,
+    apps: Vec<AppConfig>,
+    plans: Vec<PlanConfig>,
+    stats: StoreStats,
+}
+
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct ApiError {
@@ -93,9 +150,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .into_iter()
         .map(|app| (app.app_id.clone(), app))
         .collect::<HashMap<_, _>>();
+    let plans = FileStore::load_plan_configs(Path::new(&args.plan_config))?;
     let state = AppState {
         store,
         apps: Arc::new(apps),
+        plans: Arc::new(plans),
+        developer_mode: args.developer_mode,
     };
 
     let cors = CorsLayer::new()
@@ -114,6 +174,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .route("/healthz", get(healthz))
         .route("/api/v1/auth/challenge", post(post_challenge))
+        .route("/api/v1/public/apps", get(get_public_apps))
+        .route("/api/v1/public/plans", get(get_public_plans))
+        .route("/api/v1/account/overview", post(post_account_overview))
+        .route(
+            "/api/v1/account/tokens/list",
+            post(post_account_tokens_list),
+        )
+        .route(
+            "/api/v1/account/tokens/{token_id}/revoke",
+            post(post_account_token_revoke),
+        )
+        .route("/api/v1/dev/meta", get(get_developer_meta))
         .route("/api/v1/apps/{app_id}/tokens", post(post_issue_token))
         .route("/dav/{app_id}", any(handle_dav_root))
         .route("/dav/{app_id}/{*tail}", any(handle_dav_tail))
@@ -154,6 +226,38 @@ async fn post_challenge(
     }
 }
 
+async fn get_public_apps(State(state): State<AppState>) -> impl IntoResponse {
+    let mut apps = state.apps.values().cloned().collect::<Vec<_>>();
+    apps.sort_by(|left, right| left.app_id.cmp(&right.app_id));
+    (StatusCode::OK, axum::Json(apps)).into_response()
+}
+
+async fn get_public_plans(State(state): State<AppState>) -> impl IntoResponse {
+    (StatusCode::OK, axum::Json((*state.plans).clone())).into_response()
+}
+
+async fn get_developer_meta(State(state): State<AppState>) -> impl IntoResponse {
+    if !state.developer_mode {
+        return api_error(StatusCode::NOT_FOUND, "developer mode disabled");
+    }
+    let mut apps = state.apps.values().cloned().collect::<Vec<_>>();
+    apps.sort_by(|left, right| left.app_id.cmp(&right.app_id));
+    match state.store.store_stats(now_ms()) {
+        Ok(stats) => (
+            StatusCode::OK,
+            axum::Json(DeveloperMetaResponse {
+                developer_mode: true,
+                management_scope_app_id: ACCOUNT_MANAGEMENT_SCOPE.to_string(),
+                apps,
+                plans: (*state.plans).clone(),
+                stats,
+            }),
+        )
+            .into_response(),
+        Err(error) => api_error(StatusCode::INTERNAL_SERVER_ERROR, error.to_string()),
+    }
+}
+
 async fn post_issue_token(
     State(state): State<AppState>,
     AxumPath(app_id): AxumPath<String>,
@@ -165,14 +269,6 @@ async fn post_issue_token(
     if request.app_id != app_id {
         return api_error(StatusCode::BAD_REQUEST, "app id mismatch");
     }
-    let challenge = match state.store.take_challenge(&request.nonce) {
-        Ok(Some(challenge)) => challenge,
-        Ok(None) => return api_error(StatusCode::UNAUTHORIZED, "challenge not found"),
-        Err(error) => return api_error(StatusCode::INTERNAL_SERVER_ERROR, error.to_string()),
-    };
-    if challenge.expires_at_ms < now_ms() {
-        return api_error(StatusCode::UNAUTHORIZED, "challenge expired");
-    }
     let signed = SignedChallenge {
         public_key_hex: request.public_key_hex,
         signature_hex: request.signature_hex,
@@ -181,8 +277,8 @@ async fn post_issue_token(
         device_id: request.device_id,
         nonce: request.nonce,
     };
-    if let Err(error) = verify_signed_challenge(&signed) {
-        return api_error(StatusCode::UNAUTHORIZED, error.to_string());
+    if let Err(response) = verify_consumed_challenge(&state, &signed) {
+        return response;
     }
     let created_at_ms = now_ms();
     let expires_at_ms = created_at_ms + app.token_ttl_secs * 1000;
@@ -208,6 +304,116 @@ async fn post_issue_token(
         }
         Err(error) => api_error(StatusCode::INTERNAL_SERVER_ERROR, error.to_string()),
     }
+}
+
+async fn post_account_overview(
+    State(state): State<AppState>,
+    axum::Json(request): axum::Json<AccountAuthRequest>,
+) -> impl IntoResponse {
+    let signed = account_signed_challenge(&request);
+    if let Err(response) = verify_consumed_challenge(&state, &signed) {
+        return response;
+    }
+    match state
+        .store
+        .account_overview(&request.public_key_hex, now_ms())
+    {
+        Ok(overview) => (StatusCode::OK, axum::Json(overview)).into_response(),
+        Err(error) => api_error(StatusCode::INTERNAL_SERVER_ERROR, error.to_string()),
+    }
+}
+
+async fn post_account_tokens_list(
+    State(state): State<AppState>,
+    axum::Json(request): axum::Json<TokenListRequest>,
+) -> impl IntoResponse {
+    let signed = account_signed_challenge(&AccountAuthRequest {
+        public_key_hex: request.public_key_hex.clone(),
+        signature_hex: request.signature_hex.clone(),
+        timestamp_ms: request.timestamp_ms,
+        device_id: request.device_id.clone(),
+        nonce: request.nonce.clone(),
+    });
+    if let Err(response) = verify_consumed_challenge(&state, &signed) {
+        return response;
+    }
+    match state
+        .store
+        .list_tokens(&request.public_key_hex, request.app_id_filter.as_deref())
+    {
+        Ok(tokens) => (
+            StatusCode::OK,
+            axum::Json(TokenListResponse {
+                public_key_hex: request.public_key_hex,
+                tokens,
+            }),
+        )
+            .into_response(),
+        Err(error) => api_error(StatusCode::INTERNAL_SERVER_ERROR, error.to_string()),
+    }
+}
+
+async fn post_account_token_revoke(
+    State(state): State<AppState>,
+    AxumPath(token_id): AxumPath<String>,
+    axum::Json(request): axum::Json<AccountAuthRequest>,
+) -> impl IntoResponse {
+    let signed = account_signed_challenge(&request);
+    if let Err(response) = verify_consumed_challenge(&state, &signed) {
+        return response;
+    }
+    match state.store.revoke_token(&request.public_key_hex, &token_id) {
+        Ok(true) => (
+            StatusCode::OK,
+            axum::Json(TokenRevokeResponse {
+                token_id,
+                revoked: true,
+            }),
+        )
+            .into_response(),
+        Ok(false) => api_error(StatusCode::NOT_FOUND, "token not found"),
+        Err(error) => api_error(StatusCode::INTERNAL_SERVER_ERROR, error.to_string()),
+    }
+}
+
+fn account_signed_challenge(request: &AccountAuthRequest) -> SignedChallenge {
+    SignedChallenge {
+        public_key_hex: request.public_key_hex.clone(),
+        signature_hex: request.signature_hex.clone(),
+        app_id: ACCOUNT_MANAGEMENT_SCOPE.to_string(),
+        timestamp_ms: request.timestamp_ms,
+        device_id: request.device_id.clone(),
+        nonce: request.nonce.clone(),
+    }
+}
+
+fn verify_consumed_challenge(
+    state: &AppState,
+    signed: &SignedChallenge,
+) -> Result<(), Response<Body>> {
+    let challenge = match state.store.take_challenge(&signed.nonce) {
+        Ok(Some(challenge)) => challenge,
+        Ok(None) => return Err(api_error(StatusCode::UNAUTHORIZED, "challenge not found")),
+        Err(error) => {
+            return Err(api_error(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                error.to_string(),
+            ));
+        }
+    };
+    if challenge.expires_at_ms < now_ms() {
+        return Err(api_error(StatusCode::UNAUTHORIZED, "challenge expired"));
+    }
+    if challenge.public_key_hint != signed.public_key_hex {
+        return Err(api_error(
+            StatusCode::UNAUTHORIZED,
+            "challenge public key mismatch",
+        ));
+    }
+    if let Err(error) = verify_signed_challenge(signed) {
+        return Err(api_error(StatusCode::UNAUTHORIZED, error.to_string()));
+    }
+    Ok(())
 }
 
 async fn handle_dav_root(

@@ -444,6 +444,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "dweb-cloud-identity-core",
+ "dweb-cloud-storage-core",
  "reqwest",
  "serde",
  "serde_json",

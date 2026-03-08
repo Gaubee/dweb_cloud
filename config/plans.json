@@ -1,0 +1,32 @@
+[
+  {
+    "planId": "free-local",
+    "label": "Free Local / Self-host",
+    "billingMode": "local-or-self-host",
+    "yearlyPriceUsdCents": 0,
+    "yearlyPriceCnyCents": 0,
+    "maxEntries": 100000,
+    "readOnlyOnExpiry": false,
+    "retentionDays": 0,
+    "notes": [
+      "Use browser local storage or your own WebDAV/self-hosted dwebCloud.",
+      "No hosted entitlement is required.",
+      "Best fit for privacy-first or private deployment users."
+    ]
+  },
+  {
+    "planId": "cloud-sync-1000",
+    "label": "Hosted Cloud Sync 1000",
+    "billingMode": "official-hosted",
+    "yearlyPriceUsdCents": 100,
+    "yearlyPriceCnyCents": 700,
+    "maxEntries": 1000,
+    "readOnlyOnExpiry": true,
+    "retentionDays": 365,
+    "notes": [
+      "Hosted write access for up to 1000 OTP entries.",
+      "After expiry the space becomes read-only until renewal.",
+      "Encrypted data is retained for up to 365 days for export and recovery."
+    ]
+  }
+]

@@ -7,6 +7,7 @@ license.workspace = true
 [dependencies]
 clap.workspace = true
 dweb-cloud-identity-core = { path = "../crates/identity-core" }
+dweb-cloud-storage-core = { path = "../crates/storage-core" }
 reqwest.workspace = true
 serde.workspace = true
 serde_json.workspace = true

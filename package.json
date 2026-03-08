@@ -4,6 +4,7 @@
   "packageManager": "pnpm@10.22.0",
   "scripts": {
     "dev:server": "cargo run -p dweb-cloud-server -- --http 127.0.0.1:9080 --data-dir ./.data",
+    "dev:server:developer": "cargo run -p dweb-cloud-server -- --http 127.0.0.1:9080 --data-dir ./.data --developer-mode",
     "build:rust": "cargo build --workspace",
     "check:rust": "cargo test --workspace",
     "docker:build": "docker build -t gaubee/dweb-cloud:local .",
@@ -11,6 +12,7 @@
     "docker:logs": "docker compose logs -f dweb-cloud",
     "docker:down": "docker compose down",
     "docker:publish": "./scripts/publish-docker.sh",
-    "docker:publish:version": "./scripts/publish-docker.sh"
+    "docker:publish:version": "./scripts/publish-docker.sh",
+    "smoke:public-webdav": "./scripts/smoke-public-webdav.sh"
   }
 }

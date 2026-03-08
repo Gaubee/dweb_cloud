@@ -11,6 +11,8 @@ services:
       DWEB_CLOUD_HTTP: 0.0.0.0:9080
       DWEB_CLOUD_DATA_DIR: /var/lib/dweb-cloud
       DWEB_CLOUD_APP_CONFIG: /app/config/apps.json
+      DWEB_CLOUD_PLAN_CONFIG: /app/config/plans.json
+      DWEB_CLOUD_DEVELOPER_MODE: "false"
     volumes:
       - dweb-cloud-data:/var/lib/dweb-cloud
       - ./config:/app/config:ro
