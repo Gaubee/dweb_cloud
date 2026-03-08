@@ -18,7 +18,7 @@
 - 为每个 app 提供隔离的私有存储空间。
 - 对客户端暴露简单稳定的协议入口，当前优先 `WebDAV`。
 - 支持本地文件系统、自托管对象存储、未来官方托管。
-- 让 `2FA` 等产品保持纯前端化，不再强绑定自有后端。
+- 为未来 `dweb_chain` 商业公链生态提供底层开发者基础设施之一。
 
 ## 2. 读取顺序
 
@@ -43,11 +43,12 @@
 | 阶段 | 主题 | 当前状态 | 主要验收门槛 |
 | --- | --- | --- | --- |
 | Phase 1 | 文档与骨架 | `Implemented` | 文档真源齐备、工作区可构建 |
-| Phase 2 | 本地 WebDAV 存储 | `In Progress` | 本地 FS + WebDAV + token 闭环 |
+| Phase 2 | 本地 WebDAV 存储 | `Implemented / Ready for Acceptance` | 本地 FS + WebDAV + token/revoke 闭环 |
 | Phase 3 | 2FA 集成验证 | `Ready for Acceptance` | 2FA 可通过 WebDAV 完成 push/pull |
 | Phase 4 | 自托管部署闭环 | `Implemented / Ready for Acceptance` | Docker 镜像发布 + 运行文档 + 2FA 接入手册 |
-| Phase 5 | 对象存储与托管化 | `Planned` | S3 backend、在线授权、计费策略 |
-| Phase 6 | 通用应用存储云 | `Planned` | 多 app 管理、网盘、协议扩展 |
+| Phase 5 | 用户自助与开发者模式 | `In Progress` | account self-service + public plans/apps + developer meta |
+| Phase 6 | 商业化与托管控制面 | `Exploration` | entitlement、支付、配额与 operator control plane |
+| Phase 7 | 通用应用存储云 | `Planned` | S3 backend、多 app onboarding、生态协议扩展 |
 
 ## 5. 当前优先级
 
@@ -62,14 +63,14 @@
 
 ### P1. 本地 WebDAV 最小闭环
 
-状态：`In Progress`
+状态：`Implemented / Ready for Acceptance`
 
 - [x] challenge 接口
 - [x] token 签发接口
 - [x] app 隔离目录模型
 - [x] 本地文件系统存储
 - [x] WebDAV 基础读写
-- [ ] token 撤销命令
+- [x] token 撤销命令
 - [ ] 更完善的 app 注册配置
 
 ### P2. 与 2FA 集成
@@ -79,6 +80,7 @@
 - [x] 约定 `gaubee-2fa` app
 - [x] 2FA 手动 WebDAV 配置
 - [x] 旧 Self Provider 移除
+- [x] 公网 smoke 脚本
 - [ ] 双设备 push/pull 验证
 
 ### P3. 自托管部署
@@ -91,12 +93,38 @@
 - [x] `infra/2fa-webdav.md` 对接手册
 - [x] Docker Hub 发布脚本与工作流
 - [x] 反向代理与 TLS 模板
+- [x] `infra/compose.caddy.yml.example`
+- [ ] 真实公网域名验收记录
 
-### P4. 后续扩展
+### P4. 用户自助与开发者模式
 
-状态：`Planned`
+状态：`In Progress`
 
-- [ ] `S3` backend
-- [ ] `Connect dwebCloud` 授权页
-- [ ] 在线网盘 UI
-- [ ] 更通用的 app/token 管理
+- [x] `public apps`
+- [x] `public plans`
+- [x] `account overview`
+- [x] `account tokens list`
+- [x] `account token revoke`
+- [x] `developer mode meta`
+- [x] `admin stats` CLI
+- [ ] Web 用户控制台
+- [ ] operator 管理控制台
+
+### P5. 商业化与托管控制面
+
+状态：`Exploration`
+
+- [x] plan config 模型
+- [ ] entitlement 持久化
+- [ ] hosted quota enforcement
+- [ ] payment provider 接入
+- [ ] 托管版 operator 运维界面
+
+### P6. dweb_chain 基础设施对齐
+
+状态：`Exploration`
+
+- [x] 明确 developer mode 作为 app builder / infra bootstrap 入口
+- [ ] app onboarding 自助流程
+- [ ] 面向 `dweb_chain` 生态的 app space / capability 模型
+- [ ] 多 backend 与生态协议抽象

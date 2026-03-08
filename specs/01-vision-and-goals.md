@@ -15,6 +15,7 @@
 - 让服务端不持有用户明文数据
 - 让同一套云能力可复用到多个产品
 - 让自托管与官方托管共享同一套核心模型
+- 为未来 `dweb_chain` 商业公链项目提供 app builder 与存储基础设施之一
 
 ## 阶段目标
 
@@ -27,7 +28,7 @@
 
 ### Phase 2
 
-状态：`In Progress`
+状态：`Implemented / Ready for Acceptance`
 
 - 本地文件系统 backend
 - challenge + token
@@ -36,8 +37,16 @@
 
 ### Phase 3
 
+状态：`In Progress`
+
+- 用户自助与开发者模式
+- 商业 plans 配置与公开读取
+- operator 侧最小统计能力
+
+### Phase 4
+
 状态：`Planned`
 
 - `S3` backend
 - 在线授权流程
-- 更通用的 app/token 管理
+- entitlement、支付与托管控制面

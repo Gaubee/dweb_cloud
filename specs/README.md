@@ -13,3 +13,6 @@
 5. [05-2fa-integration-spec.md](./05-2fa-integration-spec.md)
 6. [06-engineering-quality-and-release-spec.md](./06-engineering-quality-and-release-spec.md)
 7. [07-deployment-and-operations-spec.md](./07-deployment-and-operations-spec.md)
+8. [08-user-self-service-spec.md](./08-user-self-service-spec.md)
+9. [09-operator-and-commercial-spec.md](./09-operator-and-commercial-spec.md)
+10. [10-developer-mode-spec.md](./10-developer-mode-spec.md)

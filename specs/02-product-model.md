@@ -3,7 +3,7 @@
 ## 文档状态
 
 - Status: Active
-- Scope: 核心对象、账号、app 空间与 token 模型
+- Scope: 核心对象、账号、app 空间、plan 与开发者模式模型
 
 ## 核心对象
 
@@ -23,8 +23,19 @@
 - 与 `account + app_id` 绑定
 - 用作 `WebDAV` 凭据中的 password
 
-### WebDAV Identity
+### Management Scope
 
-- `username = public_key_hex`
-- `password = app-scoped token`
-- `base_url = /dav/:app_id`
+- 固定 scope：`dweb-cloud-account`
+- 用于账户自助接口签名认证
+- 不直接等价于任意 app 的 WebDAV token
+
+### Plan
+
+- 描述商业套餐、容量上限、到期行为与保留时长
+- 当前通过 `config/plans.json` 配置并公开只读暴露
+
+### Developer Mode
+
+- 通过 `DWEB_CLOUD_DEVELOPER_MODE=true` 开启
+- 提供面向 app builder / operator 的元信息接口
+- 用于本地集成与未来 `dweb_chain` 基础设施调试

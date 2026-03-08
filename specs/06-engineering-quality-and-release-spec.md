@@ -19,4 +19,6 @@
 - `cargo test --workspace`
 - 与 `2FA` 的手动联调验证
 - 有 Docker 环境时，至少验证 `docker compose config`
+- 有生产编排示例时，至少验证一次 `docker compose -f ... config`
 - 变更 Dockerfile 后，应至少验证一次 `docker build` 或 `docker buildx build`
+- 公开 smoke 脚本变更后，应至少验证 `--help` 和参数解析

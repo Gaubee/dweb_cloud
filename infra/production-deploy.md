@@ -29,6 +29,7 @@ docker run -d --name dweb-cloud \
   -e DWEB_CLOUD_HTTP=0.0.0.0:9080 \
   -e DWEB_CLOUD_DATA_DIR=/var/lib/dweb-cloud \
   -e DWEB_CLOUD_APP_CONFIG=/app/config/apps.json \
+  -e DWEB_CLOUD_PLAN_CONFIG=/app/config/plans.json \
   -v dweb-cloud-data:/var/lib/dweb-cloud \
   gaubee/dweb-cloud:latest
 ```
@@ -42,6 +43,11 @@ docker run -d --name dweb-cloud \
 ```bash
 caddy run --config ./infra/caddy/Caddyfile.example
 ```
+
+如果希望直接使用 compose：
+
+- 示例文件：[compose.caddy.yml.example](./compose.caddy.yml.example)
+- 配套 Caddyfile：[caddy/Caddyfile.compose.example](./caddy/Caddyfile.compose.example)
 
 要求：
 
@@ -84,6 +90,22 @@ docker exec -it dweb-cloud dweb-cloud-cli token issue \
   --json
 ```
 
+部署完成后，建议执行公网 smoke：
+
+```bash
+./scripts/smoke-public-webdav.sh https://cloud.example.com "your secret"
+```
+
+## developer mode
+
+`developer mode` 主要用于：
+
+- 本地集成测试
+- app builder 调试
+- 为未来 `dweb_chain` 生态 app 提供基础设施接入调试能力
+
+生产环境默认不建议开启；如果开启，也应仅在受控环境中暴露。
+
 ## 当前边界
 
 本文档只覆盖：
@@ -91,6 +113,7 @@ docker exec -it dweb-cloud dweb-cloud-cli token issue \
 - 单机部署
 - 反向代理
 - HTTPS
+- 公网 smoke 验证
 
 当前仍不覆盖：
 

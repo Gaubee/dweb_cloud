@@ -20,3 +20,4 @@
 - 为 `gaubee-2fa` 签发 token
 - 2FA 可 push/pull 加密快照
 - 文档能覆盖 Rust 运行和 Docker 运行两种路径
+- 公网部署后可使用 smoke 脚本验证 WebDAV 读写
